@@ -15,23 +15,20 @@ import os
 from datetime import datetime
 import sys
 
-# Agregar src al path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src', 'fuzzy_controller'))
+# Agregar `src` al path raiz de los módulos
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
-# Importar módulos propios
-from membership_functions import (
+# Importar módulos propios usando structure en `src/`
+from fuzzy_controller.membership_functions import (
     create_temperature_variable,
     create_error_variable,
     create_power_variable
 )
-from fuzzy_rules import create_hvac_rule_base
-from fuzzy_system import (
-    FuzzyController,
-    PIDController,
-    HVACSystem,
-    simulate_control,
-    calculate_performance_metrics
-)
+from fuzzy_controller.fuzzy_rules import create_hvac_rule_base
+from fuzzy_controller.fuzzy_system import FuzzyController
+from pid_controller.pid_controller import PIDController
+from simulation.simulation import HVACSystem, simulate_control
+from fuzzy_controller.metrics import calculate_performance_metrics
 
 
 # ==================== CONFIGURACIÓN DE EXPERIMENTOS ====================
