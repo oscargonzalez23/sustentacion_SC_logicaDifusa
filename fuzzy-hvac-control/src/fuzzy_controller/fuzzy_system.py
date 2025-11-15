@@ -1,48 +1,25 @@
-"""
-Sistema de Control Difuso Completo (Fuzzy Logic Controller)
-Integra: Fuzzificación → Inferencia → Defuzzificación
-
-Este módulo une todos los componentes del controlador difuso
-para controlar la temperatura de un sistema HVAC.
-"""
-
 import numpy as np
 from typing import Dict, Optional
 
-# Utilidades auxiliares para mantener la clase más limpia
 from .controller_utils import (
     fuzzify_inputs,
     defuzzify_output,
     compute_control_surface
 )
 
-# Nota: PID, simulación y métricas están en módulos independientes bajo `src/`.
-# Se importan desde `main.py` o desde sus módulos respectivos cuando se necesitan.
-
 
 class FuzzyController:
-    """
-    Controlador Difuso completo basado en Mamdani
-    """
     
     def __init__(self, 
                  input_variables: Dict,
                  output_variable,
                  inference_engine,
                  defuzzification_method: str = 'centroid'):
-        """
-        Args:
-            input_variables: {nombre: FuzzyVariable}
-            output_variable: FuzzyVariable de salida
-            inference_engine: FuzzyInferenceEngine con reglas
-            defuzzification_method: 'centroid', 'bisector', 'mean_of_maximum'
-        """
         self.input_variables = input_variables
         self.output_variable = output_variable
         self.inference_engine = inference_engine
         self.defuzzification_method = defuzzification_method
         
-        # Historial para análisis
         self.history = {
             'inputs': [],
             'outputs': [],
@@ -50,29 +27,17 @@ class FuzzyController:
         }
         
     def compute(self, crisp_inputs: Dict[str, float]) -> float:
-        """
-        Calcula la salida crisp del controlador difuso
         
-        Args:
-            crisp_inputs: {nombre_variable: valor_crisp}
-        
-        Returns:
-            Salida crisp defuzzificada
-        """
-        # 1. FUZZIFICACIÓN: Convertir entradas crisp a difusas
         input_memberships = fuzzify_inputs(self.input_variables, crisp_inputs)
 
-        # 2. INFERENCIA: Aplicar reglas difusas
         universe = self.output_variable.get_universe()
         aggregated_output = self.inference_engine.inference(
             input_memberships,
             self.output_variable
         )
 
-        # 3. DEFUZZIFICACIÓN: Convertir salida difusa a crisp (delegado)
         crisp_output = defuzzify_output(self.defuzzification_method, universe, aggregated_output)
         
-        # Guardar historial
         self.history['inputs'].append(crisp_inputs.copy())
         self.history['outputs'].append(crisp_output)
         self.history['memberships'].append(input_memberships.copy())
@@ -80,7 +45,6 @@ class FuzzyController:
         return crisp_output
     
     def reset_history(self):
-        """Limpia el historial del controlador"""
         self.history = {
             'inputs': [],
             'outputs': [],
@@ -91,17 +55,7 @@ class FuzzyController:
                            var1_name: str, 
                            var2_name: str,
                            resolution: int = 50) -> tuple:
-        """
-        Genera superficie de control 3D
         
-        Args:
-            var1_name: Nombre de la primera variable de entrada
-            var2_name: Nombre de la segunda variable de entrada
-            resolution: Número de puntos en cada eje
-        
-        Returns:
-            (X, Y, Z) para graficar superficie
-        """
         var1 = self.input_variables[var1_name]
         var2 = self.input_variables[var2_name]
 

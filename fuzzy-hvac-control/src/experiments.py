@@ -1,7 +1,3 @@
-"""
-Módulo de experimentos - Funciones organizadas para cada tipo de experimento
-"""
-
 from src.fuzzy_controller import (
     FuzzyController,
     create_temperature_variable,
@@ -15,18 +11,17 @@ from src.simulation import HVACSystem, simulate_control
 
 
 def print_metrics_table(metrics_fuzzy, metrics_pid):
-    """Imprime tabla comparativa de métricas"""
     print("\n" + "-"*70)
-    print("MÉTRICAS DE DESEMPEÑO")
+    print("METRICAS DE DESEMPEÑO")
     print("-"*70)
-    print(f"{'Métrica':<30} {'Fuzzy':<15} {'PID':<15} {'Mejor'}")
+    print(f"{'Metrica':<30} {'Fuzzy':<15} {'PID':<15} {'Mejor'}")
     print("-"*70)
     
     comparisons = {
         'Rise Time (min)': ('rise_time', 'menor'),
         'Overshoot (%)': ('overshoot', 'menor'),
         'Settling Time (min)': ('settling_time', 'menor'),
-        'Steady-State Error (°C)': ('steady_state_error', 'menor'),
+        'Steady-State Error (C)': ('steady_state_error', 'menor'),
         'IAE': ('IAE', 'menor'),
         'ISE': ('ISE', 'menor'),
         'ITAE': ('ITAE', 'menor')
@@ -49,11 +44,10 @@ def print_metrics_table(metrics_fuzzy, metrics_pid):
             else:
                 winner = 'PID' if fuzzy_val < pid_val else 'Fuzzy'
             
-            emoji = "✓" if winner == display_name.split()[-1] else ""
             if isinstance(fuzzy_val, float):
-                print(f"{display_name:<30} {fuzzy_val:<15.3f} {pid_val:<15.3f} {emoji} {winner}")
+                print(f"{display_name:<30} {fuzzy_val:<15.3f} {pid_val:<15.3f} {winner}")
             else:
-                print(f"{display_name:<30} {fuzzy_val:<15} {pid_val:<15} {emoji} {winner}")
+                print(f"{display_name:<30} {fuzzy_val:<15} {pid_val:<15} {winner}")
         else:
             print(f"{display_name:<30} {str(fuzzy_val):<15} {str(pid_val):<15} N/A")
     
@@ -63,18 +57,15 @@ def print_metrics_table(metrics_fuzzy, metrics_pid):
 
 
 def run_experiment_1(config):
-    """Experimento 1: Comparación básica Fuzzy vs PID"""
     print("\n" + "="*70)
-    print("EXPERIMENTO 1: Comparación Básica Fuzzy vs PID")
+    print("EXPERIMENTO 1: Comparacion Basica Fuzzy vs PID")
     print("="*70)
     
-    # Crear variables difusas
     temp_var = create_temperature_variable()
     error_var = create_error_variable()
     power_var = create_power_variable()
     rule_base = create_hvac_rule_base()
     
-    # Crear controlador difuso
     fuzzy_controller = FuzzyController(
         input_variables={'Temperatura': temp_var, 'Error': error_var},
         output_variable=power_var,
@@ -82,7 +73,6 @@ def run_experiment_1(config):
         defuzzification_method='centroid'
     )
     
-    # Crear controlador PID
     pid_controller = PIDController(
         Kp=config.PID_KP,
         Ki=config.PID_KI,
@@ -90,7 +80,6 @@ def run_experiment_1(config):
         output_limits=(0, 100)
     )
     
-    # Simular con Fuzzy
     print("\n[>] Simulando controlador Difuso...")
     system_fuzzy = HVACSystem(
         initial_temp=config.INITIAL_TEMP,
@@ -104,7 +93,6 @@ def run_experiment_1(config):
         dt=config.DT
     )
     
-    # Simular con PID
     print("[>] Simulando controlador PID...")
     system_pid = HVACSystem(
         initial_temp=config.INITIAL_TEMP,
@@ -118,14 +106,12 @@ def run_experiment_1(config):
         dt=config.DT
     )
     
-    # Calcular métricas
-    print("\n[>] Calculando métricas de desempeño...")
+    print("\n[>] Calculando metricas de desempeño...")
     metrics_fuzzy = calculate_performance_metrics(results_fuzzy)
     metrics_pid = calculate_performance_metrics(results_pid)
     
     print_metrics_table(metrics_fuzzy, metrics_pid)
     
-    # Guardar gráfico
     import matplotlib.pyplot as plt
     from matplotlib.gridspec import GridSpec
     import os
@@ -133,33 +119,29 @@ def run_experiment_1(config):
     fig = plt.figure(figsize=(14, 10))
     gs = GridSpec(3, 2, figure=fig, hspace=0.3, wspace=0.3)
     
-    # Temperatura - Fuzzy
     ax1 = fig.add_subplot(gs[0, 0])
     ax1.plot(results_fuzzy['time'], results_fuzzy['temperature'], 'b-', linewidth=2)
     ax1.axhline(config.SETPOINT, color='r', linestyle='--', linewidth=1.5)
-    ax1.set_ylabel('Temperatura (°C)')
+    ax1.set_ylabel('Temperatura (C)')
     ax1.set_title('Fuzzy - Temperatura')
     ax1.grid(True, alpha=0.3)
     
-    # Temperatura - PID
     ax2 = fig.add_subplot(gs[0, 1])
     ax2.plot(results_pid['time'], results_pid['temperature'], 'g-', linewidth=2)
     ax2.axhline(config.SETPOINT, color='r', linestyle='--', linewidth=1.5)
-    ax2.set_ylabel('Temperatura (°C)')
+    ax2.set_ylabel('Temperatura (C)')
     ax2.set_title('PID - Temperatura')
     ax2.grid(True, alpha=0.3)
     
-    # Comparación
     ax3 = fig.add_subplot(gs[1, :])
     ax3.plot(results_fuzzy['time'], results_fuzzy['temperature'], 'b-', linewidth=2, label='Fuzzy', alpha=0.7)
     ax3.plot(results_pid['time'], results_pid['temperature'], 'g-', linewidth=2, label='PID', alpha=0.7)
     ax3.axhline(config.SETPOINT, color='r', linestyle='--', linewidth=1.5, label='Setpoint')
-    ax3.set_ylabel('Temperatura (°C)')
-    ax3.set_title('Comparación: Fuzzy vs PID')
+    ax3.set_ylabel('Temperatura (C)')
+    ax3.set_title('Comparacion: Fuzzy vs PID')
     ax3.grid(True, alpha=0.3)
     ax3.legend()
     
-    # Potencia - Fuzzy
     ax4 = fig.add_subplot(gs[2, 0])
     ax4.plot(results_fuzzy['time'], results_fuzzy['power'], 'b-', linewidth=2)
     ax4.set_ylabel('Potencia (%)')
@@ -168,7 +150,6 @@ def run_experiment_1(config):
     ax4.grid(True, alpha=0.3)
     ax4.set_ylim([0, 100])
     
-    # Potencia - PID
     ax5 = fig.add_subplot(gs[2, 1])
     ax5.plot(results_pid['time'], results_pid['power'], 'g-', linewidth=2)
     ax5.set_ylabel('Potencia (%)')
@@ -192,18 +173,15 @@ def run_experiment_1(config):
 
 
 def run_experiment_2(config):
-    """Experimento 2: Respuesta a perturbaciones"""
     print("\n" + "="*70)
     print("EXPERIMENTO 2: Respuesta a Perturbaciones")
     print("="*70)
     
-    # Crear variables difusas
     temp_var = create_temperature_variable()
     error_var = create_error_variable()
     power_var = create_power_variable()
     rule_base = create_hvac_rule_base()
     
-    # Crear controladores
     fuzzy_controller = FuzzyController(
         input_variables={'Temperatura': temp_var, 'Error': error_var},
         output_variable=power_var,
@@ -218,7 +196,6 @@ def run_experiment_2(config):
         output_limits=(0, 100)
     )
     
-    # Perturbaciones como diccionario
     disturbances = {
         config.DURATION * 0.3: 3.0,
         config.DURATION * 0.6: -4.0
@@ -226,9 +203,8 @@ def run_experiment_2(config):
     
     print("\n[>] Perturbaciones programadas:")
     for t, delta in disturbances.items():
-        print(f"   t={t:.1f}min: {delta:+.1f}°C")
+        print(f"   t={t:.1f}min: {delta:+.1f}C")
     
-    # Simular
     system_fuzzy = HVACSystem(
         initial_temp=config.INITIAL_TEMP,
         ambient_temp=config.AMBIENT_TEMP
@@ -255,7 +231,6 @@ def run_experiment_2(config):
         disturbances=disturbances
     )
     
-    # Graficar
     import matplotlib.pyplot as plt
     from matplotlib.gridspec import GridSpec
     import os
@@ -269,7 +244,7 @@ def run_experiment_2(config):
     ax1.axhline(config.SETPOINT, color='r', linestyle='--', linewidth=1.5, label='Setpoint')
     for t in disturbances.keys():
         ax1.axvline(t, color='orange', linestyle=':', alpha=0.5)
-    ax1.set_ylabel('Temperatura (°C)')
+    ax1.set_ylabel('Temperatura (C)')
     ax1.set_title('Respuesta a Perturbaciones')
     ax1.grid(True, alpha=0.3)
     ax1.legend()
@@ -303,9 +278,8 @@ def run_experiment_2(config):
 
 
 def run_experiment_3(config):
-    """Experimento 3: Comparación de métodos de defuzzificación"""
     print("\n" + "="*70)
-    print("EXPERIMENTO 3: Comparación de Métodos de Defuzzificación")
+    print("EXPERIMENTO 3: Comparacion de Metodos de Defuzzificacion")
     print("="*70)
     
     methods = ['centroid', 'bisector', 'mean_of_maximum']
@@ -342,11 +316,10 @@ def run_experiment_3(config):
         methods_data[method] = results
         methods_metrics[method] = calculate_performance_metrics(results)
     
-    # Mostrar comparativa
     print("\n" + "-"*70)
-    print("COMPARACIÓN DE MÉTODOS DE DEFUZZIFICACIÓN")
+    print("COMPARACION DE METODOS DE DEFUZZIFICACION")
     print("-"*70)
-    print(f"{'Métrica':<23} {'centroid':<15} {'bisector':<15} {'mean_of_max'}")
+    print(f"{'Metrica':<23} {'centroid':<15} {'bisector':<15} {'mean_of_max'}")
     print("-"*70)
     
     for metric_key in ['rise_time', 'overshoot', 'settling_time', 'steady_state_error', 'IAE', 'ISE']:
@@ -359,7 +332,6 @@ def run_experiment_3(config):
     
     print("-"*70)
     
-    # Graficar
     import matplotlib.pyplot as plt
     import os
     
@@ -375,14 +347,14 @@ def run_experiment_3(config):
                     linewidth=2, label=method, color=color, alpha=0.7)
     
     axes[0].axhline(config.SETPOINT, color='orange', linestyle='--', linewidth=1.5, label='Setpoint')
-    axes[0].set_ylabel('Temperatura (°C)')
-    axes[0].set_title('Comparación de Métodos de Defuzzificación - Temperatura')
+    axes[0].set_ylabel('Temperatura (C)')
+    axes[0].set_title('Comparacion de Metodos de Defuzzificacion - Temperatura')
     axes[0].grid(True, alpha=0.3)
     axes[0].legend()
     
     axes[1].set_xlabel('Tiempo (min)')
     axes[1].set_ylabel('Potencia (%)')
-    axes[1].set_title('Comparación de Métodos de Defuzzificación - Control')
+    axes[1].set_title('Comparacion de Metodos de Defuzzificacion - Control')
     axes[1].grid(True, alpha=0.3)
     axes[1].set_ylim([0, 100])
     axes[1].legend()

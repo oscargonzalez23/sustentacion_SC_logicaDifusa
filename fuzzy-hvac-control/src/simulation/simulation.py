@@ -1,17 +1,9 @@
-"""
-Modelo del sistema HVAC y función de simulación (módulo separado)
-"""
 import numpy as np
 from typing import Dict, Optional
 
 
 class HVACSystem:
-    """
-    Modelo simplificado de un sistema HVAC
-    Dinámica térmica de primer orden:
-    dT/dt = -(T - T_ambient)/τ + gain*power
-    """
-
+    
     def __init__(self, 
                  initial_temp: float = 20.0,
                  ambient_temp: float = 30.0,
@@ -30,7 +22,7 @@ class HVACSystem:
         }
 
     def update(self, power: float, dt: float = 1.0):
-        """Actualiza la temperatura del sistema"""
+        
         dT_dt = (-(self.temperature - self.ambient_temp) / self.time_constant 
                  + self.gain * power)
 
@@ -64,9 +56,7 @@ def simulate_control(controller,
                     duration: float = 100.0,
                     dt: float = 1.0,
                     disturbances: Optional[Dict[float, float]] = None):
-    """
-    Simula el sistema de control en lazo cerrado
-    """
+    
     if disturbances is None:
         disturbances = {}
 
@@ -83,14 +73,11 @@ def simulate_control(controller,
         current_temp = system.temperature
         error = setpoint - current_temp
 
-        # Calcular señal de control
-        # Importar localmente para evitar dependencia circular
         from ..pid_controller import PIDController
 
         if isinstance(controller, PIDController):
             power = controller.compute(error, dt)
         else:
-            # Asumir controlador difuso
             power = controller.compute({
                 'Temperatura': current_temp,
                 'Error': error

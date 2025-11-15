@@ -1,28 +1,15 @@
-"""
-Script Principal - Simulación y Comparación de Controladores
-Ejecuta experimentos completos comparando controladores difusos y PID
-
-Autor: [Tu nombre]
-Fecha: 2025
-Curso: Lógica Difusa en Sistemas de Control
-"""
-
 import os
 from datetime import datetime
 from src.experiments import run_experiment_1, run_experiment_2, run_experiment_3
 
 
-# ==================== CONFIGURACIÓN DE EXPERIMENTOS ====================
-
 def input_parameters():
-    """Solicita parámetros de forma interactiva desde consola"""
     print("\n" + "="*70)
     print("INGRESE PARAMETROS DE SIMULACION")
     print("="*70)
     print("(Presione ENTER para usar valores por defecto)\n")
     
     def get_float(prompt, default):
-        """Solicita un número flotante con valor por defecto"""
         while True:
             try:
                 value = input(f"{prompt} [default: {default}]: ").strip()
@@ -30,21 +17,18 @@ def input_parameters():
                     return default
                 return float(value)
             except ValueError:
-                print(f"  ✗ Error: Ingrese un número válido")
+                print(f"  X Error: Ingrese un numero valido")
     
-    # Parámetros del sistema
-    print("--- PARÁMETROS DEL SISTEMA TÉRMICO ---")
-    initial_temp = get_float("Temperatura inicial (°C)", 20.0)
-    ambient_temp = get_float("Temperatura ambiente (°C)", 30.0)
-    setpoint = get_float("Setpoint / Temperatura deseada (°C)", 22.0)
+    print("--- PARAMETROS DEL SISTEMA TERMICO ---")
+    initial_temp = get_float("Temperatura inicial (C)", 20.0)
+    ambient_temp = get_float("Temperatura ambiente (C)", 30.0)
+    setpoint = get_float("Setpoint / Temperatura deseada (C)", 22.0)
     
-    # Parámetros de simulación
-    print("\n--- PARÁMETROS DE SIMULACIÓN ---")
-    duration = get_float("Duración de simulación (minutos)", 100.0)
+    print("\n--- PARAMETROS DE SIMULACION ---")
+    duration = get_float("Duracion de simulacion (minutos)", 100.0)
     dt = get_float("Paso de tiempo (minutos)", 0.5)
     
-    # Parámetros PID
-    print("\n--- PARÁMETROS DEL CONTROLADOR PID ---")
+    print("\n--- PARAMETROS DEL CONTROLADOR PID ---")
     kp = get_float("Ganancia proporcional (Kp)", 8.0)
     ki = get_float("Ganancia integral (Ki)", 0.3)
     kd = get_float("Ganancia derivativa (Kd)", 2.0)
@@ -65,8 +49,6 @@ def input_parameters():
 
 
 class ExperimentConfig:
-    """Configuración global de experimentos"""
-    
     INITIAL_TEMP = 20.0
     AMBIENT_TEMP = 30.0
     SETPOINT = 22.0
@@ -79,7 +61,6 @@ class ExperimentConfig:
     
     @classmethod
     def update_from_dict(cls, params_dict):
-        """Actualiza la configuración desde diccionario de parámetros"""
         cls.INITIAL_TEMP = params_dict['initial_temp']
         cls.AMBIENT_TEMP = params_dict['ambient_temp']
         cls.SETPOINT = params_dict['setpoint']
@@ -92,37 +73,31 @@ class ExperimentConfig:
 
 
 def print_header():
-    """Imprime encabezado del programa"""
     print("\n" + "="*70)
     print("SISTEMA DE CONTROL DIFUSO PARA HVAC")
-    print("Comparación con Controlador PID Clásico")
+    print("Comparacion con Controlador PID Clasico")
     print("="*70)
     print(f"\nFecha: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"\nConfiguración:")
-    print(f"  • Temperatura inicial: {ExperimentConfig.INITIAL_TEMP}°C")
-    print(f"  • Temperatura ambiente: {ExperimentConfig.AMBIENT_TEMP}°C")
-    print(f"  • Setpoint: {ExperimentConfig.SETPOINT}°C")
-    print(f"  • Duración: {ExperimentConfig.DURATION} min")
-    print(f"  • Paso de tiempo: {ExperimentConfig.DT} min")
-    print(f"  • PID (Kp, Ki, Kd): ({ExperimentConfig.PID_KP}, "
+    print(f"\nConfiguracion:")
+    print(f"  - Temperatura inicial: {ExperimentConfig.INITIAL_TEMP}C")
+    print(f"  - Temperatura ambiente: {ExperimentConfig.AMBIENT_TEMP}C")
+    print(f"  - Setpoint: {ExperimentConfig.SETPOINT}C")
+    print(f"  - Duracion: {ExperimentConfig.DURATION} min")
+    print(f"  - Paso de tiempo: {ExperimentConfig.DT} min")
+    print(f"  - PID (Kp, Ki, Kd): ({ExperimentConfig.PID_KP}, "
           f"{ExperimentConfig.PID_KI}, {ExperimentConfig.PID_KD})")
-    print(f"  • Directorio de resultados: {ExperimentConfig.RESULTS_DIR}\n")
+    print(f"  - Directorio de resultados: {ExperimentConfig.RESULTS_DIR}\n")
 
 
 def main():
-    """Ejecuta todos los experimentos"""
-    
-    # Solicitar parámetros de forma interactiva
     params = input_parameters()
     ExperimentConfig.update_from_dict(params)
     
-    # Crear directorio de resultados
     os.makedirs(ExperimentConfig.RESULTS_DIR, exist_ok=True)
     
     print_header()
     
     try:
-        # Ejecutar los tres experimentos
         run_experiment_1(ExperimentConfig)
         run_experiment_2(ExperimentConfig)
         run_experiment_3(ExperimentConfig)
@@ -133,7 +108,7 @@ def main():
         print(f"Resultados guardados en: {ExperimentConfig.RESULTS_DIR}/\n")
         
     except Exception as e:
-        print(f"\nError durante la ejecución: {e}")
+        print(f"\nError durante la ejecucion: {e}")
         import traceback
         traceback.print_exc()
 
