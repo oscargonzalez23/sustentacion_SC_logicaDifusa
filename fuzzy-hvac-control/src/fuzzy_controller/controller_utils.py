@@ -41,7 +41,7 @@ def defuzzify_output(method: str, universe: np.ndarray, aggregated_output: np.nd
     Returns:
         Valor crisp resultante
     """
-    from fuzzy_controller.defuzzification import Defuzzifier
+    from .defuzzification import Defuzzifier
 
     defuzz = Defuzzifier()
     if method == 'centroid':

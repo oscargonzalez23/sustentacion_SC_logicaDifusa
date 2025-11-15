@@ -8,10 +8,9 @@ para controlar la temperatura de un sistema HVAC.
 
 import numpy as np
 from typing import Dict, Optional
-import sys
 
 # Utilidades auxiliares para mantener la clase más limpia
-from fuzzy_controller.controller_utils import (
+from .controller_utils import (
     fuzzify_inputs,
     defuzzify_output,
     compute_control_surface

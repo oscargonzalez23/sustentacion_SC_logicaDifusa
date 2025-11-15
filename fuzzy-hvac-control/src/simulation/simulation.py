@@ -85,7 +85,7 @@ def simulate_control(controller,
 
         # Calcular señal de control
         # Importar localmente para evitar dependencia circular
-        from pid_controller.pid_controller import PIDController
+        from ..pid_controller import PIDController
 
         if isinstance(controller, PIDController):
             power = controller.compute(error, dt)

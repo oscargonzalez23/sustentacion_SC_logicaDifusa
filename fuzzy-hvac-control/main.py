@@ -13,22 +13,18 @@ from matplotlib.gridspec import GridSpec
 import json
 import os
 from datetime import datetime
-import sys
 
-# Agregar `src` al path raiz de los módulos
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
-
-# Importar módulos propios usando structure en `src/`
-from fuzzy_controller.membership_functions import (
+# Importar desde paquetes en `src/`
+from src.fuzzy_controller import (
+    FuzzyController,
     create_temperature_variable,
     create_error_variable,
-    create_power_variable
+    create_power_variable,
+    create_hvac_rule_base,
+    calculate_performance_metrics,
 )
-from fuzzy_controller.fuzzy_rules import create_hvac_rule_base
-from fuzzy_controller.fuzzy_system import FuzzyController
-from pid_controller.pid_controller import PIDController
-from simulation.simulation import HVACSystem, simulate_control
-from fuzzy_controller.metrics import calculate_performance_metrics
+from src.pid_controller import PIDController
+from src.simulation import HVACSystem, simulate_control
 
 
 # ==================== CONFIGURACIÓN DE EXPERIMENTOS ====================
